@@ -1,0 +1,148 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f8f9fb;
+}
+
+/* Dark Mode */
+.dark {
+  background: #0f172a;
+  color: white;
+}
+
+.dark .sidebar {
+  background: #020617;
+}
+
+.dark .card,
+.dark .popup-content {
+  background: #1e293b;
+  color: white;
+}
+
+.dark input {
+  background: #0f172a;
+  color: white;
+  border: 1px solid #444;
+}
+
+/* Layout */
+.container {
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: white;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+}
+
+.menu-btn {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border: none;
+  background: #f1f3f5;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.menu-btn.active {
+  background: #ff8c42;
+  color: white;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  gap: 10px;
+}
+
+.topbar input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.search-btn {
+  background: #ff8c42;
+  border: none;
+  padding: 10px;
+  color: white;
+  border-radius: 8px;
+}
+
+/* Cards */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card {
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card img {
+  width: 150px;
+  height: 120px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 10px;
+}
+
+/* Popup */
+.popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+}
+
+/* Customize Panel */
+.customize-panel {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 1000;
+}
+
+.customize-panel img {
+  width: 80px;
+  height: 60px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 6px;
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>StreetFood Finder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>🍜 StreetFood Finder</h2>
+
+    <button class="menu-btn" onclick="toggleTheme()">🌙 Toggle Theme</button>
+    <button class="menu-btn" onclick="openPopup()">➕ Add Stall</button>
+    <button class="menu-btn active">🍽 Explore Stalls</button>
+    <button class="menu-btn" onclick="toggleCustomize()">🎨 Customize</button>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <div class="topbar">
+      <input type="text" placeholder="Find a City or Area...">
+      <button class="search-btn">Search</button>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards"></div>
+
+  </div>
+</div>
+
+<!-- Popup Form -->
+<div id="popupForm" class="popup">
+  <div class="popup-content">
+    <h3>Add New Stall</h3>
+
+    <input type="text" id="stallName" placeholder="Stall Name">
+    <input type="text" id="stallLocation" placeholder="Location">
+    <input type="text" id="stallImage" placeholder="Image URL">
+    <input type="number" id="stallRating" placeholder="Rating (1-5)">
+
+    <button onclick="addStall()">Add Stall</button>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<!-- Customize Panel -->
+<div id="customizePanel" class="customize-panel">
+  <h3>Choose Background</h3>
+
+  <img src="bg1.jpg" onclick="setBg('bg1.jpg')">
+  <img src="bg2.jpg" onclick="setBg('bg2.jpg')">
+  <img src="bg3.jpg" onclick="setBg('bg3.jpg')">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
