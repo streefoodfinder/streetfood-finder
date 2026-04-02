@@ -21,25 +21,49 @@
     <button onclick="openPopup()">➕ Add Stall</button>
   </div>
 
-  <!-- Main -->
+  <!-- Main Content -->
   <div class="main">
+    <div class="top-bar">
+      <input placeholder="Find a City or Area..." />
+      <button>Search</button>
+    </div>
+
     <div class="cards"></div>
   </div>
 
 </div>
 
-<!-- Popup -->
+<!-- 🔥 PREMIUM POPUP -->
 <div id="popupForm" class="popup">
-  <div class="popup-content">
-    <h3>Add Stall</h3>
+  <div class="popup-card">
 
-    <input id="stallName" placeholder="Name">
-    <input id="stallLocation" placeholder="Location">
-    <input id="stallImage" placeholder="Image URL">
-    <input id="stallRating" placeholder="Rating">
+    <h2>Add New Stall 🍜</h2>
 
-    <button onclick="addStall()">Add</button>
-    <button onclick="closePopup()">Close</button>
+    <div class="input-group">
+      <label>Stall Name</label>
+      <input id="stallName" placeholder="e.g. Sandeep Egg Roll">
+    </div>
+
+    <div class="input-group">
+      <label>Location</label>
+      <input id="stallLocation" placeholder="e.g. Patna">
+    </div>
+
+    <div class="input-group">
+      <label>Image URL</label>
+      <input id="stallImage" placeholder="Paste image link">
+    </div>
+
+    <div class="input-group">
+      <label>Rating</label>
+      <input id="stallRating" placeholder="1 - 5">
+    </div>
+
+    <div class="popup-buttons">
+      <button class="add-btn" onclick="addStall()">Add Stall</button>
+      <button class="close-btn" onclick="closePopup()">Cancel</button>
+    </div>
+
   </div>
 </div>
 
