@@ -11,7 +11,6 @@
 
   <style>
     body.dark { background:#0f172a; color:white; }
-    body.dark .card { background:#1e293b; color:white; }
 
     .theme-btn {
       position: fixed;
@@ -40,21 +39,7 @@
       width:300px;
     }
 
-    .card {
-      background:white;
-      padding:10px;
-      border-radius:10px;
-      width:200px;
-      margin:10px;
-      display:inline-block;
-    }
-
-    img { width:100%; border-radius:10px; }
-
-    #progressBox {
-      display:none;
-      margin-top:10px;
-    }
+    #progressBox { display:none; margin-top:10px; }
 
     #toast {
       position:fixed;
@@ -62,7 +47,7 @@
       right:20px;
       background:#111;
       color:white;
-      padding:10px 15px;
+      padding:10px;
       border-radius:10px;
       display:none;
     }
@@ -71,17 +56,35 @@
 
 <body>
 
+<!-- 🌙 THEME -->
 <div class="theme-btn" onclick="toggleTheme()">🌙</div>
 
-<h1>🍜 StreetFood Finder</h1>
+<div class="container">
 
-<button onclick="openPopup()">+ Add Stall</button>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>🍜 StreetFood</h2>
 
-<input id="searchLocation" placeholder="Location">
-<input id="searchFood" placeholder="Food">
-<button onclick="searchStalls()">Search</button>
+    <button onclick="openPopup()">+ Add Stall</button>
+    <button>Explore</button>
+    <button>Customize</button>
+  </div>
 
-<div id="cards"></div>
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- SEARCH -->
+    <div class="top-bar">
+      <input id="searchLocation" placeholder="Enter location">
+      <input id="searchFood" placeholder="Search food">
+      <button onclick="searchStalls()">Search</button>
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards" id="cards"></div>
+
+  </div>
+</div>
 
 <!-- POPUP -->
 <div id="popup" class="popup">
@@ -89,13 +92,13 @@
 
     <h2>Add Stall</h2>
 
-    <input id="stallName" placeholder="Name"><br><br>
-    <input id="stallLocation" placeholder="Location"><br><br>
-    <input id="stallRating" placeholder="Rating"><br><br>
-    <input type="file" id="stallImage"><br>
+    <input id="stallName" placeholder="Stall Name">
+    <input id="stallLocation" placeholder="Location">
+    <input id="stallRating" placeholder="Rating (1-5)">
+    <input type="file" id="stallImage">
 
-    <!-- IMAGE PREVIEW -->
-    <img id="preview" style="display:none; margin-top:10px;">
+    <!-- PREVIEW -->
+    <img id="preview" style="display:none; width:100%; margin-top:10px; border-radius:10px;">
 
     <!-- PROGRESS -->
     <div id="progressBox">
@@ -154,9 +157,8 @@ document.getElementById("stallImage").addEventListener("change", function() {
 });
 
 
-// 🚀 ADD STALL (FINAL FIXED)
+// 🚀 ADD STALL
 function addStall() {
-
   let name = document.getElementById("stallName").value;
   let location = document.getElementById("stallLocation").value;
   let rating = document.getElementById("stallRating").value;
@@ -185,7 +187,6 @@ function addStall() {
     let data = JSON.parse(xhr.responseText);
 
     if (data.secure_url) {
-
       db.collection("stalls").add({
         name,
         location,
@@ -200,6 +201,8 @@ function addStall() {
 
       closePopup();
       loadStalls();
+    } else {
+      showToast("Upload failed ❌");
     }
   };
 
@@ -275,7 +278,6 @@ function showToast(msg) {
 loadStalls();
 
 </script>
-<script src="script.js"></script>
 
 </body>
 </html>
