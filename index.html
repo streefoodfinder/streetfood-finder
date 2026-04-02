@@ -12,28 +12,31 @@
 
 <body>
 
-<!-- MENU -->
-<div class="menu-btn" onclick="toggleSidebar()">☰</div>
+<!-- HEADER -->
+<header class="header">
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <h1>🍜 Street🌍Food 🍔</h1>
+  <div class="theme-btn" onclick="toggleTheme()">🌙</div>
+</header>
 
 <!-- SIDEBAR -->
 <div id="sidebar" class="sidebar">
   <h2>🍜 SFF</h2>
   <button onclick="openPopup()">➕ Add Stall</button>
-  <button onclick="deleteAllStalls()">Delete All</button>
   <button>Explore</button>
+  <button onclick="toggleTheme()">🌗 Toggle Mode</button>
+  <button onclick="alert('Contact: your@email.com')">📩 Contact Me</button>
 </div>
 
 <!-- MAIN -->
 <div class="main">
 
-  <!-- SEARCH -->
   <div class="top-bar">
     <input id="searchLocation" placeholder="📍 Location">
     <input id="searchFood" placeholder="🍔 Food">
     <button onclick="searchStalls()">Search</button>
   </div>
 
-  <!-- CARDS -->
   <div id="cards" class="cards"></div>
 
 </div>
@@ -47,13 +50,13 @@
     <input id="stallName" placeholder="Food Name">
     <input id="stallLocation" placeholder="Location">
 
-    <!-- ⭐ STARS -->
+    <!-- ⭐ STAR SYSTEM -->
     <div class="stars">
-      <span onclick="setRating(1)">⭐</span>
-      <span onclick="setRating(2)">⭐</span>
-      <span onclick="setRating(3)">⭐</span>
-      <span onclick="setRating(4)">⭐</span>
-      <span onclick="setRating(5)">⭐</span>
+      <span onclick="setRating(1)">☆</span>
+      <span onclick="setRating(2)">☆</span>
+      <span onclick="setRating(3)">☆</span>
+      <span onclick="setRating(4)">☆</span>
+      <span onclick="setRating(5)">☆</span>
     </div>
 
     <input id="stallComment" placeholder="Comment">
@@ -65,7 +68,13 @@
   </div>
 </div>
 
-<div id="toast"></div>
+<!-- 🎬 SUCCESS SCREEN -->
+<div id="successScreen" class="success-screen">
+  <div class="food-animation">
+    🍕 🍔 🌮 🍣 🍜 🥟 🍟 🍩 🍗 🌯
+  </div>
+  <h2>Upload Successful 🚀</h2>
+</div>
 
 <script src="script.js"></script>
 </body>
