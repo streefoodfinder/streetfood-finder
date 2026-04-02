@@ -149,22 +149,26 @@ function searchStalls() {
 }
 function getLocation() {
   if (!navigator.geolocation) {
-    alert("Geolocation not supported");
+    alert("Location not supported");
     return;
   }
+
+  // Show friendly message
+  alert("📍 Finding nearby street food...");
 
   navigator.geolocation.getCurrentPosition(
     function(position) {
       let lat = position.coords.latitude;
       let lon = position.coords.longitude;
 
-      alert("Location detected ✅\nLat: " + lat + "\nLon: " + lon);
+      // FOR NOW → just auto-fill location input (temporary)
+      document.getElementById("searchLocation").value = "your area";
+
+      // auto search
+      searchStalls();
     },
     function(error) {
-      alert("Location error ❌: " + error.message);
+      alert("Please allow location to find nearby stalls 🙏");
     }
   );
-};
-
-  // Future: convert to city (we upgrade next)
 }
