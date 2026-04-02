@@ -1,4 +1,4 @@
-// 🔥 FIREBASE CONFIG
+// FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBuT_SZS4Fhc42QDNBBdwFnabzxPJOPWrA",
   authDomain: "streetfood-finder.firebaseapp.com",
@@ -8,173 +8,104 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-
-// 🌙 THEME TOGGLE
-function toggleTheme() {
-  document.body.classList.toggle("dark");
+// SIDEBAR
+function toggleSidebar(){
+  sidebar.classList.toggle("active");
 }
 
+// POPUP
+function openPopup(){ popup.style.display="flex"; }
+function closePopup(){ popup.style.display="none"; }
 
-// 📌 POPUP
-function openPopup() {
-  document.getElementById("popup").style.display = "flex";
-}
+// STAR
+let rating = 0;
+function setRating(r){ rating = r; }
 
-function closePopup() {
-  document.getElementById("popup").style.display = "none";
-}
+// ADD
+function addStall(){
+  let name = stallName.value;
+  let location = stallLocation.value;
+  let comment = stallComment.value;
+  let file = stallImage.files[0];
 
-
-// 🖼 IMAGE PREVIEW
-document.getElementById("stallImage").addEventListener("change", function () {
-  let file = this.files[0];
-  let preview = document.getElementById("preview");
-
-  if (file) {
-    preview.src = URL.createObjectURL(file);
-    preview.style.display = "block";
-  }
-});
-
-
-// 🚀 ADD STALL (FINAL WORKING)
-function addStall() {
-  let name = document.getElementById("stallName").value;
-  let location = document.getElementById("stallLocation").value;
-  let rating = document.getElementById("stallRating").value;
-  let file = document.getElementById("stallImage").files[0];
-
-  if (!name || !location || !rating || !file) {
-    showToast("Fill all fields ❗");
+  if(!name || !location || !file || rating==0){
+    showToast("Fill all fields");
     return;
   }
-
-  document.getElementById("progressBox").style.display = "block";
 
   let formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", "new_rd");
 
-  let xhr = new XMLHttpRequest();
-  xhr.open("POST", "https://api.cloudinary.com/v1_1/dlptddlij/image/upload");
+  fetch("https://api.cloudinary.com/v1_1/dlptddlij/image/upload",{
+    method:"POST",
+    body:formData
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    db.collection("stalls").add({
+      name,
+      location,
+      rating,
+      comment,
+      image:data.secure_url
+    });
 
-  // 📊 PROGRESS
-  xhr.upload.onprogress = function (e) {
-    if (e.lengthComputable) {
-      let percent = Math.round((e.loaded / e.total) * 100);
-      document.getElementById("progressBar").style.width = percent + "%";
-    }
-  };
-
-  // ✅ SUCCESS
-  xhr.onload = function () {
-    let data = JSON.parse(xhr.responseText);
-
-    if (data.secure_url) {
-      db.collection("stalls").add({
-        name,
-        location,
-        rating,
-        image: data.secure_url,
-      });
-
-      showToast("Uploaded successfully ✅");
-
-      document.getElementById("progressBox").style.display = "none";
-      document.getElementById("progressBar").style.width = "0%";
-
-      closePopup();
-      loadStalls();
-    } else {
-      showToast("Upload failed ❌");
-    }
-  };
-
-  // ❌ ERROR
-  xhr.onerror = function () {
-    showToast("Network error ❌");
-  };
-
-  xhr.send(formData);
+    showToast("Uploaded ✅");
+    loadStalls();
+    closePopup();
+  });
 }
 
+// LOAD
+function loadStalls(){
+  cards.innerHTML="";
+  db.collection("stalls").get().then(snap=>{
+    snap.forEach(doc=>{
+      let s=doc.data();
 
-// 📦 LOAD STALLS
-function loadStalls() {
-  let container = document.getElementById("cards");
-  container.innerHTML = "";
+      cards.innerHTML+=`
+      <div class="card">
+        <img src="${s.image}">
+        <h3>${s.name}</h3>
+        <p>📍 ${s.location}</p>
+        <p>⭐ ${s.rating}</p>
+        <p>💬 ${s.comment || ""}</p>
+      </div>`;
+    });
+  });
+}
 
-  db.collection("stalls").get().then((snapshot) => {
-    snapshot.forEach((doc) => {
-      let s = doc.data();
+// SEARCH
+function searchStalls(){
+  let loc=searchLocation.value.toLowerCase();
+  let food=searchFood.value.toLowerCase();
 
-      container.innerHTML += `
+  cards.innerHTML="";
+  db.collection("stalls").get().then(snap=>{
+    snap.forEach(doc=>{
+      let s=doc.data();
+
+      if(s.location.toLowerCase().includes(loc) &&
+         s.name.toLowerCase().includes(food)){
+        cards.innerHTML+=`
         <div class="card">
           <img src="${s.image}">
           <h3>${s.name}</h3>
           <p>📍 ${s.location}</p>
           <p>⭐ ${s.rating}</p>
-        </div>
-      `;
-    });
-  });
-}
-
-
-// 🔍 SEARCH
-function searchStalls() {
-  let loc = document.getElementById("searchLocation").value.toLowerCase();
-  let food = document.getElementById("searchFood").value.toLowerCase();
-
-  let container = document.getElementById("cards");
-  container.innerHTML = "";
-
-  db.collection("stalls").get().then((snapshot) => {
-    snapshot.forEach((doc) => {
-      let s = doc.data();
-
-      if (
-        s.location.toLowerCase().includes(loc) &&
-        s.name.toLowerCase().includes(food)
-      ) {
-        container.innerHTML += `
-          <div class="card">
-            <img src="${s.image}">
-            <h3>${s.name}</h3>
-            <p>📍 ${s.location}</p>
-            <p>⭐ ${s.rating}</p>
-          </div>
-        `;
+          <p>💬 ${s.comment || ""}</p>
+        </div>`;
       }
     });
   });
 }
 
-
-// 🔔 TOAST MESSAGE
-function showToast(msg) {
-  let toast = document.getElementById("toast");
-  toast.innerText = msg;
-  toast.style.display = "block";
-
-  setTimeout(() => {
-    toast.style.display = "none";
-  }, 2000);
+// TOAST
+function showToast(msg){
+  toast.innerText=msg;
+  toast.style.display="block";
+  setTimeout(()=>toast.style.display="none",2000);
 }
 
-
-// 🔄 LOAD ON START
 loadStalls();
-
-function toggleSidebar() {
-  let sidebar = document.getElementById("sidebar");
-
-  if (sidebar.style.left === "0px") {
-    sidebar.style.left = "-220px";
-  } else {
-    sidebar.style.left = "0px";
-  }
-}
-function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("active");
-}
