@@ -148,19 +148,23 @@ function searchStalls() {
   });
 }
 function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
+  if (!navigator.geolocation) {
     alert("Geolocation not supported");
+    return;
   }
-}
 
-function showPosition(position) {
-  let lat = position.coords.latitude;
-  let lon = position.coords.longitude;
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      let lat = position.coords.latitude;
+      let lon = position.coords.longitude;
 
-  // For now: just show coordinates
-  alert("Your location:\nLat: " + lat + "\nLon: " + lon);
+      alert("Location detected ✅\nLat: " + lat + "\nLon: " + lon);
+    },
+    function(error) {
+      alert("Location error ❌: " + error.message);
+    }
+  );
+};
 
   // Future: convert to city (we upgrade next)
 }
