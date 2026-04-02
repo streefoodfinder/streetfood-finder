@@ -33,18 +33,17 @@ function addStall() {
 
   let formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", "new_rd");
+  formData.append("upload_preset", "new_rd"); // 🔥 VERY IMPORTANT
 
-  // ⚠️ IMPORTANT: YOUR CORRECT CLOUD NAME USED HERE
   fetch("https://api.cloudinary.com/v1_1/dlptddlij/image/upload", {
     method: "POST",
     body: formData
   })
   .then(res => res.json())
   .then(data => {
+    console.log("Cloudinary response:", data); // 👈 DEBUG
 
     if (data.secure_url) {
-
       db.collection("stalls").add({
         name: name,
         location: location,
@@ -55,18 +54,18 @@ function addStall() {
       alert("Upload successful ✅");
       closePopup();
       loadStalls();
-
     } else {
       alert("Upload failed ❌");
       console.log(data);
     }
-
   })
   .catch(err => {
     console.error(err);
-    alert("Error uploading image ❌");
+    alert("Error uploading ❌");
   });
 }
+
+
 
 
 // 📦 LOAD STALLS
