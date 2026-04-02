@@ -54,23 +54,18 @@ function showStalls() {
       let stall = doc.data();
 
       container.innerHTML += `
-        <div class="card">
-          <img src="${stall.image || 'https://source.unsplash.com/400x300/?street-food'}" />
-          
-          <div class="card-content">
-            <h3>${stall.name} ❤️</h3>
-            <p>📍 ${stall.location}</p>
-            <p>⭐ ${stall.rating}/5</p>
+  <div class="card">
+    <img src="${stall.image || 'https://source.unsplash.com/400x300/?street-food'}" />
 
-            <input placeholder="Write comment..." id="c-${doc.id}">
-            <button onclick="addComment('${doc.id}')">Post</button>
+    <div class="card-content">
+      <h3>${stall.name}</h3>
+      <p>📍 ${stall.location}</p>
+      <p>⭐ ${stall.rating}</p>
 
-            <div>
-              ${(stall.comments || []).map(c => `<p>💬 ${c}</p>`).join("")}
-            </div>
-          </div>
-        </div>
-      `;
+      <button onclick="openMap('${stall.location}')">Get Direction</button>
+    </div>
+  </div>
+`;
     });
   });
 }
@@ -149,26 +144,23 @@ function searchStalls() {
 }
 function getLocation() {
   if (!navigator.geolocation) {
-    alert("Location not supported");
+    alert("Geolocation not supported");
     return;
   }
-
-  // Show friendly message
-  alert("📍 Finding nearby street food...");
 
   navigator.geolocation.getCurrentPosition(
     function(position) {
       let lat = position.coords.latitude;
       let lon = position.coords.longitude;
 
-      // FOR NOW → just auto-fill location input (temporary)
-      document.getElementById("searchLocation").value = "your area";
-
-      // auto search
-      searchStalls();
+      alert("Location detected ✅\nLat: " + lat + "\nLon: " + lon);
     },
     function(error) {
-      alert("Please allow location to find nearby stalls 🙏");
+      alert("Location error ❌: " + error.message);
     }
   );
+}
+function openMap(location) {
+  let url = "https://www.google.com/maps/search/?api=1&query=" + location;
+  window.open(url, "_blank");
 }
