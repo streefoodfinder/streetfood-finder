@@ -31,38 +31,46 @@ function addStall() {
     return;
   }
 
+  document.getElementById("loader").style.display = "block";
+
   let formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", "new_rd"); // 🔥 VERY IMPORTANT
+  formData.append("upload_preset", "new_rd");
 
-  fetch("https://api.cloudinary.com/v1_1/dlptddlij/image/upload", {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    console.log("Cloudinary response:", data); // 👈 DEBUG
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", "https://api.cloudinary.com/v1_1/dlptddlij/image/upload");
+
+  xhr.upload.addEventListener("progress", function(e) {
+    if (e.lengthComputable) {
+      let percent = Math.round((e.loaded / e.total) * 100);
+      document.getElementById("progress").innerText = percent + "%";
+    }
+  });
+
+  xhr.onload = function() {
+    let data = JSON.parse(xhr.responseText);
 
     if (data.secure_url) {
       db.collection("stalls").add({
-        name: name,
-        location: location,
-        rating: rating,
+        name,
+        location,
+        rating,
         image: data.secure_url
       });
 
-      alert("Upload successful ✅");
+      document.getElementById("loader").innerText = "Uploaded ✅";
+
+      setTimeout(() => {
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("progress").innerText = "0%";
+      }, 2000);
+
       closePopup();
       loadStalls();
-    } else {
-      alert("Upload failed ❌");
-      console.log(data);
     }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Error uploading ❌");
-  });
+  };
+
+  xhr.send(formData);
 }
 
 

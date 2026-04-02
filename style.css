@@ -149,3 +149,14 @@ body {
   color: white;
   cursor: pointer;
 }
+.loader {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #111;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
