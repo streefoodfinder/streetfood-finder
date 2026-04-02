@@ -8,9 +8,52 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* DARK MODE */
+    body.dark {
+      background: #0f172a;
+      color: white;
+    }
+
+    body.dark .card {
+      background: #1e293b;
+      color: white;
+    }
+
+    body.dark input {
+      background: #1e293b;
+      color: white;
+    }
+
+    body.dark .popup-box {
+      background: #1e293b;
+    }
+
+    /* THEME BUTTON */
+    .theme-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      font-size: 20px;
+      cursor: pointer;
+      background: white;
+      padding: 10px;
+      border-radius: 50%;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    body.dark .theme-btn {
+      background: #1e293b;
+      color: white;
+    }
+  </style>
 </head>
 
 <body>
+
+<!-- 🌙 THEME BUTTON -->
+<div class="theme-btn" onclick="toggleTheme()">🌙</div>
 
 <div class="container">
 
@@ -56,6 +99,7 @@
 
 <script>
 
+// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBuT_SZS4Fhc42QDNBBdwFnabzxPJOPWrA",
   authDomain: "streetfood-finder.firebaseapp.com",
@@ -65,6 +109,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+
+// 🌙 THEME TOGGLE
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+}
+
+
+// 📌 POPUP
 function openPopup() {
   document.getElementById("popup").style.display = "flex";
 }
@@ -73,7 +125,8 @@ function closePopup() {
   document.getElementById("popup").style.display = "none";
 }
 
-// 🔥 CLOUDINARY UPLOAD
+
+// 🚀 ADD STALL (FIXED CLOUDINARY)
 function addStall() {
   let name = document.getElementById("stallName").value;
   let location = document.getElementById("stallLocation").value;
@@ -89,26 +142,39 @@ function addStall() {
   formData.append("file", file);
   formData.append("upload_preset", "new_rd");
 
-  fetch("https://api.cloudinary.com/v1_1/dlptddjli/image/upload", {
+  fetch("https://api.cloudinary.com/v1_1/dlptddlij/image/upload", {
     method: "POST",
     body: formData
   })
   .then(res => res.json())
   .then(data => {
 
-    db.collection("stalls").add({
-      name,
-      location,
-      rating,
-      image: data.secure_url
-    });
+    console.log(data);
 
-    closePopup();
-    loadStalls();
+    if (data.secure_url) {
+      db.collection("stalls").add({
+        name,
+        location,
+        rating,
+        image: data.secure_url
+      });
+
+      alert("Upload successful ✅");
+      closePopup();
+      loadStalls();
+    } else {
+      alert("Upload failed ❌");
+    }
+
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error uploading ❌");
   });
 }
 
-// LOAD
+
+// 📦 LOAD
 function loadStalls() {
   let container = document.getElementById("cards");
   container.innerHTML = "";
@@ -129,7 +195,8 @@ function loadStalls() {
   });
 }
 
-// SEARCH
+
+// 🔍 SEARCH
 function searchStalls() {
   let loc = document.getElementById("searchLocation").value.toLowerCase();
   let food = document.getElementById("searchFood").value.toLowerCase();
@@ -158,6 +225,8 @@ function searchStalls() {
   });
 }
 
+
+// 🔄 LOAD ON START
 loadStalls();
 
 </script>
