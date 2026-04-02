@@ -10,99 +10,113 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* DARK MODE */
-    body.dark {
-      background: #0f172a;
-      color: white;
-    }
+    body.dark { background:#0f172a; color:white; }
+    body.dark .card { background:#1e293b; color:white; }
 
-    body.dark .card {
-      background: #1e293b;
-      color: white;
-    }
-
-    body.dark input {
-      background: #1e293b;
-      color: white;
-    }
-
-    body.dark .popup-box {
-      background: #1e293b;
-    }
-
-    /* THEME BUTTON */
     .theme-btn {
       position: fixed;
       top: 20px;
       right: 20px;
-      font-size: 20px;
       cursor: pointer;
       background: white;
       padding: 10px;
       border-radius: 50%;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     }
 
-    body.dark .theme-btn {
-      background: #1e293b;
-      color: white;
+    .popup {
+      display:none;
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.5);
+      justify-content:center;
+      align-items:center;
+    }
+
+    .popup-box {
+      background:white;
+      padding:20px;
+      border-radius:10px;
+      width:300px;
+    }
+
+    .card {
+      background:white;
+      padding:10px;
+      border-radius:10px;
+      width:200px;
+      margin:10px;
+      display:inline-block;
+    }
+
+    img { width:100%; border-radius:10px; }
+
+    #progressBox {
+      display:none;
+      margin-top:10px;
+    }
+
+    #toast {
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      background:#111;
+      color:white;
+      padding:10px 15px;
+      border-radius:10px;
+      display:none;
     }
   </style>
 </head>
 
 <body>
 
-<!-- 🌙 THEME BUTTON -->
 <div class="theme-btn" onclick="toggleTheme()">🌙</div>
 
-<div class="container">
+<h1>🍜 StreetFood Finder</h1>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h2>🍜 StreetFood</h2>
+<button onclick="openPopup()">+ Add Stall</button>
 
-    <button onclick="openPopup()">+ Add Stall</button>
-    <button>Explore</button>
-    <button>Customize</button>
-  </div>
+<input id="searchLocation" placeholder="Location">
+<input id="searchFood" placeholder="Food">
+<button onclick="searchStalls()">Search</button>
 
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- SEARCH -->
-    <div class="top-bar">
-      <input id="searchLocation" placeholder="Enter location">
-      <input id="searchFood" placeholder="Search food">
-      <button onclick="searchStalls()">Search</button>
-    </div>
-
-    <!-- CARDS -->
-    <div class="cards" id="cards"></div>
-
-  </div>
-</div>
+<div id="cards"></div>
 
 <!-- POPUP -->
 <div id="popup" class="popup">
   <div class="popup-box">
+
     <h2>Add Stall</h2>
 
-    <input id="stallName" placeholder="Stall Name">
-    <input id="stallLocation" placeholder="Location">
-    <input id="stallRating" placeholder="Rating (1-5)">
-    <input type="file" id="stallImage">
+    <input id="stallName" placeholder="Name"><br><br>
+    <input id="stallLocation" placeholder="Location"><br><br>
+    <input id="stallRating" placeholder="Rating"><br><br>
+    <input type="file" id="stallImage"><br>
 
+    <!-- IMAGE PREVIEW -->
+    <img id="preview" style="display:none; margin-top:10px;">
+
+    <!-- PROGRESS -->
+    <div id="progressBox">
+      <div style="background:#ddd;">
+        <div id="progressBar" style="width:0%; height:8px; background:orange;"></div>
+      </div>
+    </div>
+
+    <br>
     <button onclick="addStall()">Submit</button>
     <button onclick="closePopup()">Close</button>
+
   </div>
-</div> 
-<div id="loader" class="loader">
-  <p>Uploading... <span id="progress">0%</span></p>
 </div>
+
+<!-- TOAST -->
+<div id="toast"></div>
 
 <script>
 
-// 🔥 FIREBASE CONFIG
+// 🔥 FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBuT_SZS4Fhc42QDNBBdwFnabzxPJOPWrA",
   authDomain: "streetfood-finder.firebaseapp.com",
@@ -113,7 +127,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 
-// 🌙 THEME TOGGLE
+// 🌙 THEME
 function toggleTheme() {
   document.body.classList.toggle("dark");
 }
@@ -123,38 +137,55 @@ function toggleTheme() {
 function openPopup() {
   document.getElementById("popup").style.display = "flex";
 }
-
 function closePopup() {
   document.getElementById("popup").style.display = "none";
 }
 
 
-// 🚀 ADD STALL (FIXED CLOUDINARY)
+// 🖼 IMAGE PREVIEW
+document.getElementById("stallImage").addEventListener("change", function() {
+  let file = this.files[0];
+  let preview = document.getElementById("preview");
+
+  if (file) {
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  }
+});
+
+
+// 🚀 ADD STALL (FINAL FIXED)
 function addStall() {
+
   let name = document.getElementById("stallName").value;
   let location = document.getElementById("stallLocation").value;
   let rating = document.getElementById("stallRating").value;
   let file = document.getElementById("stallImage").files[0];
 
   if (!name || !location || !rating || !file) {
-    alert("Fill all fields!");
+    showToast("Fill all fields ❗");
     return;
   }
+
+  document.getElementById("progressBox").style.display = "block";
 
   let formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", "new_rd");
 
-  fetch("https://api.cloudinary.com/v1_1/dlptddlij/image/upload", {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", "https://api.cloudinary.com/v1_1/dlptddlij/image/upload");
 
-    console.log(data);
+  xhr.upload.onprogress = function(e) {
+    let percent = Math.round((e.loaded / e.total) * 100);
+    document.getElementById("progressBar").style.width = percent + "%";
+  };
+
+  xhr.onload = function() {
+    let data = JSON.parse(xhr.responseText);
 
     if (data.secure_url) {
+
       db.collection("stalls").add({
         name,
         location,
@@ -162,18 +193,17 @@ function addStall() {
         image: data.secure_url
       });
 
-      alert("Upload successful ✅");
+      showToast("Uploaded ✅");
+
+      document.getElementById("progressBox").style.display = "none";
+      document.getElementById("progressBar").style.width = "0%";
+
       closePopup();
       loadStalls();
-    } else {
-      alert("Upload failed ❌");
     }
+  };
 
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Error uploading ❌");
-  });
+  xhr.send(formData);
 }
 
 
@@ -229,10 +259,23 @@ function searchStalls() {
 }
 
 
-// 🔄 LOAD ON START
+// 🔔 TOAST
+function showToast(msg) {
+  let toast = document.getElementById("toast");
+  toast.innerText = msg;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 2000);
+}
+
+
+// START
 loadStalls();
 
 </script>
+<script src="script.js"></script>
 
 </body>
 </html>

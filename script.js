@@ -9,6 +9,12 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 
+// 🌙 THEME TOGGLE
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+}
+
+
 // 📌 POPUP
 function openPopup() {
   document.getElementById("popup").style.display = "flex";
@@ -19,7 +25,19 @@ function closePopup() {
 }
 
 
-// 🚀 ADD STALL (WITH CLOUDINARY IMAGE UPLOAD)
+// 🖼 IMAGE PREVIEW
+document.getElementById("stallImage").addEventListener("change", function () {
+  let file = this.files[0];
+  let preview = document.getElementById("preview");
+
+  if (file) {
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  }
+});
+
+
+// 🚀 ADD STALL (FINAL WORKING)
 function addStall() {
   let name = document.getElementById("stallName").value;
   let location = document.getElementById("stallLocation").value;
@@ -27,11 +45,11 @@ function addStall() {
   let file = document.getElementById("stallImage").files[0];
 
   if (!name || !location || !rating || !file) {
-    alert("Fill all fields!");
+    showToast("Fill all fields ❗");
     return;
   }
 
-  document.getElementById("loader").style.display = "block";
+  document.getElementById("progressBox").style.display = "block";
 
   let formData = new FormData();
   formData.append("file", file);
@@ -40,14 +58,16 @@ function addStall() {
   let xhr = new XMLHttpRequest();
   xhr.open("POST", "https://api.cloudinary.com/v1_1/dlptddlij/image/upload");
 
-  xhr.upload.addEventListener("progress", function(e) {
+  // 📊 PROGRESS
+  xhr.upload.onprogress = function (e) {
     if (e.lengthComputable) {
       let percent = Math.round((e.loaded / e.total) * 100);
-      document.getElementById("progress").innerText = percent + "%";
+      document.getElementById("progressBar").style.width = percent + "%";
     }
-  });
+  };
 
-  xhr.onload = function() {
+  // ✅ SUCCESS
+  xhr.onload = function () {
     let data = JSON.parse(xhr.responseText);
 
     if (data.secure_url) {
@@ -55,25 +75,28 @@ function addStall() {
         name,
         location,
         rating,
-        image: data.secure_url
+        image: data.secure_url,
       });
 
-      document.getElementById("loader").innerText = "Uploaded ✅";
+      showToast("Uploaded successfully ✅");
 
-      setTimeout(() => {
-        document.getElementById("loader").style.display = "none";
-        document.getElementById("progress").innerText = "0%";
-      }, 2000);
+      document.getElementById("progressBox").style.display = "none";
+      document.getElementById("progressBar").style.width = "0%";
 
       closePopup();
       loadStalls();
+    } else {
+      showToast("Upload failed ❌");
     }
+  };
+
+  // ❌ ERROR
+  xhr.onerror = function () {
+    showToast("Network error ❌");
   };
 
   xhr.send(formData);
 }
-
-
 
 
 // 📦 LOAD STALLS
@@ -81,8 +104,8 @@ function loadStalls() {
   let container = document.getElementById("cards");
   container.innerHTML = "";
 
-  db.collection("stalls").get().then(snapshot => {
-    snapshot.forEach(doc => {
+  db.collection("stalls").get().then((snapshot) => {
+    snapshot.forEach((doc) => {
       let s = doc.data();
 
       container.innerHTML += `
@@ -106,8 +129,8 @@ function searchStalls() {
   let container = document.getElementById("cards");
   container.innerHTML = "";
 
-  db.collection("stalls").get().then(snapshot => {
-    snapshot.forEach(doc => {
+  db.collection("stalls").get().then((snapshot) => {
+    snapshot.forEach((doc) => {
       let s = doc.data();
 
       if (
@@ -125,6 +148,18 @@ function searchStalls() {
       }
     });
   });
+}
+
+
+// 🔔 TOAST MESSAGE
+function showToast(msg) {
+  let toast = document.getElementById("toast");
+  toast.innerText = msg;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 2000);
 }
 
 
