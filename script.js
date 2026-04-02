@@ -109,3 +109,12 @@ function showToast(msg){
 }
 
 loadStalls();
+function deleteAllStalls(){
+  db.collection("stalls").get().then(snapshot=>{
+    snapshot.forEach(doc=>{
+      doc.ref.delete();
+    });
+    alert("All stalls deleted ✅");
+    loadStalls();
+  });
+}
