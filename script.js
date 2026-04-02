@@ -90,3 +90,28 @@ function addComment(id) {
 window.onload = function () {
   showStalls();
 };
+
+// Welcome Popup
+function closeWelcome() {
+  document.getElementById("welcomePopup").style.display = "none";
+}
+
+// Auto close after 7 sec
+window.onload = function () {
+  setTimeout(() => {
+    let popup = document.getElementById("welcomePopup");
+    if (popup) popup.style.display = "none";
+  }, 7000);
+
+  showStalls(); // keep your existing function
+};
+
+// Theme toggle
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+}
+
+// Customize toggle (basic for now)
+function toggleCustomize() {
+  alert("Customize panel coming next 🔥");
+}
