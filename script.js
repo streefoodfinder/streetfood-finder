@@ -115,3 +115,32 @@ function toggleTheme() {
 function toggleCustomize() {
   alert("Customize panel coming next 🔥");
 }
+function searchStalls() {
+  let locationInput = document.getElementById("searchLocation").value.toLowerCase();
+  let foodInput = document.getElementById("searchFood").value.toLowerCase();
+
+  db.collection("stalls").get().then(snapshot => {
+    let container = document.querySelector(".cards");
+    container.innerHTML = "";
+
+    snapshot.forEach(doc => {
+      let stall = doc.data();
+
+      let matchLocation = stall.location.toLowerCase().includes(locationInput);
+      let matchFood = stall.name.toLowerCase().includes(foodInput);
+
+      if (matchLocation && matchFood) {
+        container.innerHTML += `
+          <div class="card">
+            <img src="${stall.image || 'https://source.unsplash.com/400x300/?food'}" />
+            <div>
+              <h3>${stall.name}</h3>
+              <p>📍 ${stall.location}</p>
+              <p>⭐ ${stall.rating}</p>
+            </div>
+          </div>
+        `;
+      }
+    });
+  });
+}
