@@ -10,16 +10,35 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 
+<div id="welcomePopup" class="welcome-popup">
+  <div class="welcome-card">
+
+    <div class="logo">SFF</div>
+
+    <h2>Welcome to StreetFood Finder 🍜</h2>
+
+    <p>
+      Discover the best street food around you.<br>
+      Add your favorite spots and help others explore!
+    </p>
+
+    <button onclick="closeWelcome()">Start Exploring 🚀</button>
+
+  </div>
+</div>
+
 <body>
 
 <div class="container">
 
   <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>🍜 StreetFood Finder</h2>
+<div class="sidebar">
+  <h2>🍜 SFF</h2>
 
-    <button onclick="openPopup()">➕ Add Stall</button>
-  </div>
+  <button onclick="toggleTheme()">🌙 Theme</button>
+  <button onclick="toggleCustomize()">🎨 Customize</button>
+  <button onclick="openPopup()">➕ Add Stall</button>
+</div>
 
   <!-- Main -->
   <div class="main">
