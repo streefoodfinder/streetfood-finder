@@ -147,3 +147,20 @@ function searchStalls() {
     });
   });
 }
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    alert("Geolocation not supported");
+  }
+}
+
+function showPosition(position) {
+  let lat = position.coords.latitude;
+  let lon = position.coords.longitude;
+
+  // For now: just show coordinates
+  alert("Your location:\nLat: " + lat + "\nLon: " + lon);
+
+  // Future: convert to city (we upgrade next)
+}
