@@ -7,83 +7,181 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <link rel="stylesheet" href="style.css">
-
   <style>
-    body.dark { background:#0f172a; color:white; }
+/* GLOBAL */
+body {
+  margin:0;
+  font-family:'Segoe UI';
+  background:#f3f4f6;
+}
 
-    .theme-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      cursor: pointer;
-      background: white;
-      padding: 10px;
-      border-radius: 50%;
-    }
+/* DARK MODE */
+body.dark {
+  background:#0f172a;
+  color:white;
+}
 
-    .popup {
-      display:none;
-      position:fixed;
-      top:0; left:0;
-      width:100%; height:100%;
-      background:rgba(0,0,0,0.5);
-      justify-content:center;
-      align-items:center;
-    }
+/* MENU BUTTON */
+.menu-btn {
+  position:fixed;
+  top:20px;
+  left:20px;
+  font-size:22px;
+  cursor:pointer;
+  z-index:1000;
+}
 
-    .popup-box {
-      background:white;
-      padding:20px;
-      border-radius:10px;
-      width:300px;
-    }
+/* SIDEBAR */
+.sidebar {
+  position:fixed;
+  left:-230px;
+  top:0;
+  width:220px;
+  height:100%;
+  background:#111;
+  color:white;
+  padding:20px;
+  transition:0.3s;
+}
 
-    #progressBox { display:none; margin-top:10px; }
+.sidebar.active { left:0; }
 
-    #toast {
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      background:#111;
-      color:white;
-      padding:10px;
-      border-radius:10px;
-      display:none;
-    }
+.sidebar button {
+  width:100%;
+  margin:10px 0;
+  padding:10px;
+  border:none;
+  background:#222;
+  color:white;
+  border-radius:8px;
+}
+
+/* MAIN */
+.main { padding:70px 20px; }
+
+/* SEARCH */
+.top-bar {
+  display:flex;
+  gap:10px;
+  background:white;
+  padding:10px;
+  border-radius:15px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.1);
+}
+
+.top-bar input {
+  flex:1;
+  padding:10px;
+  border:none;
+  outline:none;
+}
+
+.top-bar button {
+  background:#ff7a18;
+  color:white;
+  border:none;
+  padding:10px 20px;
+  border-radius:10px;
+}
+
+/* CARDS */
+.cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:20px;
+  margin-top:20px;
+}
+
+/* CARD */
+.card {
+  background:linear-gradient(135deg,#ffffff,#f1f5f9);
+  border-radius:15px;
+  padding:10px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+  transition:0.3s;
+}
+
+body.dark .card {
+  background:#1e293b;
+}
+
+.card:hover {
+  transform:translateY(-5px);
+}
+
+.card img {
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.card h3 {
+  margin:10px 0 5px;
+}
+
+.card p {
+  margin:3px 0;
+}
+
+/* POPUP */
+.popup {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.5);
+  justify-content:center;
+  align-items:center;
+}
+
+.popup-box {
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  width:300px;
+}
+
+/* STAR RATING */
+.stars span {
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* TOAST */
+#toast {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#111;
+  color:white;
+  padding:10px;
+  border-radius:10px;
+  display:none;
+}
   </style>
 </head>
 
 <body>
 
-<!-- 🌙 THEME -->
-<div class="theme-btn" onclick="toggleTheme()">🌙</div>
+<div class="menu-btn" onclick="toggleSidebar()">☰</div>
 
-<div class="container">
+<div id="sidebar" class="sidebar">
+  <h2>🍜 SFF</h2>
+  <button onclick="openPopup()">Add Stall</button>
+  <button>Explore</button>
+</div>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h2>🍜 StreetFood</h2>
+<div class="main">
 
-    <button onclick="openPopup()">+ Add Stall</button>
-    <button>Explore</button>
-    <button>Customize</button>
+  <div class="top-bar">
+    <input id="searchLocation" placeholder="📍 Location">
+    <input id="searchFood" placeholder="🍔 Food">
+    <button onclick="searchStalls()">Search</button>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
+  <div id="cards" class="cards"></div>
 
-    <!-- SEARCH -->
-    <div class="top-bar">
-      <input id="searchLocation" placeholder="Enter location">
-      <input id="searchFood" placeholder="Search food">
-      <button onclick="searchStalls()">Search</button>
-    </div>
-
-    <!-- CARDS -->
-    <div class="cards" id="cards"></div>
-
-  </div>
 </div>
 
 <!-- POPUP -->
@@ -92,252 +190,148 @@
 
     <h2>Add Stall</h2>
 
-    <input id="stallName" placeholder="Stall Name">
-    <input id="stallLocation" placeholder="Location">
-    <input id="stallRating" placeholder="Rating (1-5)">
-    <input type="file" id="stallImage">
+    <input id="stallName" placeholder="Food Name"><br><br>
+    <input id="stallLocation" placeholder="Location"><br><br>
 
-    <!-- PREVIEW -->
-    <img id="preview" style="display:none; width:100%; margin-top:10px; border-radius:10px;">
-
-    <!-- PROGRESS -->
-    <div id="progressBox">
-      <div style="background:#ddd;">
-        <div id="progressBar" style="width:0%; height:8px; background:orange;"></div>
-      </div>
+    <!-- ⭐ STAR RATING -->
+    <div class="stars" id="stars">
+      <span onclick="setRating(1)">⭐</span>
+      <span onclick="setRating(2)">⭐</span>
+      <span onclick="setRating(3)">⭐</span>
+      <span onclick="setRating(4)">⭐</span>
+      <span onclick="setRating(5)">⭐</span>
     </div>
 
-    <br>
+    <!-- COMMENT -->
+    <input id="stallComment" placeholder="Write comment"><br><br>
+
+    <input type="file" id="stallImage"><br><br>
+
     <button onclick="addStall()">Submit</button>
     <button onclick="closePopup()">Close</button>
 
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
 
-// 🔥 FIREBASE
+// FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBuT_SZS4Fhc42QDNBBdwFnabzxPJOPWrA",
   authDomain: "streetfood-finder.firebaseapp.com",
   projectId: "streetfood-finder",
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-
-// 🌙 THEME
-function toggleTheme() {
-  document.body.classList.toggle("dark");
+// SIDEBAR
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("active");
 }
 
+// POPUP
+function openPopup(){ document.getElementById("popup").style.display="flex"; }
+function closePopup(){ document.getElementById("popup").style.display="none"; }
 
-// 📌 POPUP
-function openPopup() {
-  document.getElementById("popup").style.display = "flex";
+// ⭐ RATING
+let selectedRating = 0;
+function setRating(r){
+  selectedRating = r;
 }
-function closePopup() {
-  document.getElementById("popup").style.display = "none";
-}
 
+// ADD STALL
+function addStall(){
+  let name = stallName.value;
+  let location = stallLocation.value;
+  let comment = stallComment.value;
+  let file = stallImage.files[0];
 
-// 🖼 IMAGE PREVIEW
-document.getElementById("stallImage").addEventListener("change", function() {
-  let file = this.files[0];
-  let preview = document.getElementById("preview");
-
-  if (file) {
-    preview.src = URL.createObjectURL(file);
-    preview.style.display = "block";
-  }
-});
-
-
-// 🚀 ADD STALL
-function addStall() {
-  let name = document.getElementById("stallName").value;
-  let location = document.getElementById("stallLocation").value;
-  let rating = document.getElementById("stallRating").value;
-  let file = document.getElementById("stallImage").files[0];
-
-  if (!name || !location || !rating || !file) {
-    showToast("Fill all fields ❗");
+  if(!name || !location || !file || selectedRating==0){
+    showToast("Fill all fields");
     return;
   }
-
-  document.getElementById("progressBox").style.display = "block";
 
   let formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", "new_rd");
 
-  let xhr = new XMLHttpRequest();
-  xhr.open("POST", "https://api.cloudinary.com/v1_1/dlptddlij/image/upload");
+  fetch("https://api.cloudinary.com/v1_1/dlptddlij/image/upload",{
+    method:"POST",
+    body:formData
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    db.collection("stalls").add({
+      name,
+      location,
+      rating:selectedRating,
+      comment,
+      image:data.secure_url
+    });
 
-  xhr.upload.onprogress = function(e) {
-    let percent = Math.round((e.loaded / e.total) * 100);
-    document.getElementById("progressBar").style.width = percent + "%";
-  };
-
-  xhr.onload = function() {
-    let data = JSON.parse(xhr.responseText);
-
-    if (data.secure_url) {
-      db.collection("stalls").add({
-        name,
-        location,
-        rating,
-        image: data.secure_url
-      });
-
-      showToast("Uploaded ✅");
-
-      document.getElementById("progressBox").style.display = "none";
-      document.getElementById("progressBar").style.width = "0%";
-
-      closePopup();
-      loadStalls();
-    } else {
-      showToast("Upload failed ❌");
-    }
-  };
-
-  xhr.send(formData);
+    showToast("Uploaded ✅");
+    closePopup();
+    loadStalls();
+  });
 }
 
+// LOAD
+function loadStalls(){
+  cards.innerHTML="";
+  db.collection("stalls").get().then(snap=>{
+    snap.forEach(doc=>{
+      let s=doc.data();
 
-// 📦 LOAD
-function loadStalls() {
-  let container = document.getElementById("cards");
-  container.innerHTML = "";
+      cards.innerHTML+=`
+      <div class="card">
+        <img src="${s.image}">
+        <h3>${s.name}</h3>
+        <p>📍 ${s.location}</p>
+        <p>⭐ ${s.rating}</p>
+        <p>💬 ${s.comment || ""}</p>
+      </div>`;
+    });
+  });
+}
 
-  db.collection("stalls").get().then(snapshot => {
-    snapshot.forEach(doc => {
-      let s = doc.data();
+// SEARCH
+function searchStalls(){
+  let loc=searchLocation.value.toLowerCase();
+  let food=searchFood.value.toLowerCase();
 
-      container.innerHTML += `
+  cards.innerHTML="";
+  db.collection("stalls").get().then(snap=>{
+    snap.forEach(doc=>{
+      let s=doc.data();
+
+      if(s.location.toLowerCase().includes(loc) &&
+         s.name.toLowerCase().includes(food)){
+        cards.innerHTML+=`
         <div class="card">
           <img src="${s.image}">
           <h3>${s.name}</h3>
           <p>📍 ${s.location}</p>
           <p>⭐ ${s.rating}</p>
-        </div>
-      `;
-    });
-  });
-}
-
-
-// 🔍 SEARCH
-function searchStalls() {
-  let loc = document.getElementById("searchLocation").value.toLowerCase();
-  let food = document.getElementById("searchFood").value.toLowerCase();
-
-  let container = document.getElementById("cards");
-  container.innerHTML = "";
-
-  db.collection("stalls").get().then(snapshot => {
-    snapshot.forEach(doc => {
-      let s = doc.data();
-
-      if (
-        s.location.toLowerCase().includes(loc) &&
-        s.name.toLowerCase().includes(food)
-      ) {
-        container.innerHTML += `
-          <div class="card">
-            <img src="${s.image}">
-            <h3>${s.name}</h3>
-            <p>📍 ${s.location}</p>
-            <p>⭐ ${s.rating}</p>
-          </div>
-        `;
+          <p>💬 ${s.comment || ""}</p>
+        </div>`;
       }
     });
   });
 }
 
-
-// 🔔 TOAST
-function showToast(msg) {
-  let toast = document.getElementById("toast");
-  toast.innerText = msg;
-  toast.style.display = "block";
-
-  setTimeout(() => {
-    toast.style.display = "none";
-  }, 2000);
+// TOAST
+function showToast(msg){
+  toast.innerText=msg;
+  toast.style.display="block";
+  setTimeout(()=>toast.style.display="none",2000);
 }
-
 
 // START
 loadStalls();
 
 </script>
-
-<body>
-
-<!-- 🌙 THEME -->
-<div class="theme-btn" onclick="toggleTheme()">🌙</div>
-
-<!-- ☰ MENU BUTTON -->
-<div class="menu-btn" onclick="toggleSidebar()">☰</div>
-
-<!-- SIDEBAR -->
-<div id="sidebar" class="sidebar">
-  <h2>🍜 SFF</h2>
-  <button onclick="openPopup()">➕ Add Stall</button>
-  <button>🔍 Explore</button>
-  <button>🎨 Customize</button>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- PREMIUM SEARCH -->
-  <div class="search-box">
-    <input id="searchLocation" placeholder="📍 Location">
-    <input id="searchFood" placeholder="🍔 What do you want?">
-    <button onclick="searchStalls()">Search</button>
-  </div>
-
-  <!-- CARDS -->
-  <div class="cards" id="cards"></div>
-
-</div>
-
-<!-- POPUP (KEEP SAME) -->
-<div id="popup" class="popup">
-  <div class="popup-box">
-
-    <h2>Add Stall</h2>
-
-    <input id="stallName" placeholder="Stall Name">
-    <input id="stallLocation" placeholder="Location">
-    <input id="stallRating" placeholder="Rating (1-5)">
-    <input type="file" id="stallImage">
-
-    <img id="preview" style="display:none; width:100%; margin-top:10px; border-radius:10px;">
-
-    <div id="progressBox">
-      <div style="background:#ddd;">
-        <div id="progressBar" style="width:0%; height:8px; background:orange;"></div>
-      </div>
-    </div>
-
-    <br>
-    <button onclick="addStall()">Submit</button>
-    <button onclick="closePopup()">Close</button>
-
-  </div>
-</div>
-
-<div id="toast"></div>
-<div class="menu-btn" onclick="toggleSidebar()">☰</div>
 
 </body>
 </html>
