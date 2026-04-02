@@ -7,82 +7,37 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #f5f5f5;
-      text-align: center;
-    }
-
-    h1 {
-      margin-top: 20px;
-    }
-
-    button {
-      padding: 10px;
-      margin: 10px;
-      cursor: pointer;
-      background: orange;
-      border: none;
-      border-radius: 8px;
-      color: white;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 15px;
-      padding: 20px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 10px;
-      padding: 10px;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-    }
-
-    .card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .popup-box {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      width: 250px;
-    }
-
-    input {
-      width: 100%;
-      margin: 5px 0;
-      padding: 8px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>🍜 StreetFood Finder</h1>
+<div class="container">
 
-<button onclick="openPopup()">+ Add Stall</button>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>🍜 StreetFood</h2>
 
-<div class="cards" id="cards"></div>
+    <button onclick="openPopup()">+ Add Stall</button>
+    <button>Explore</button>
+    <button>Customize</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- SEARCH -->
+    <div class="top-bar">
+      <input id="searchLocation" placeholder="Enter location">
+      <input id="searchFood" placeholder="Search food">
+      <button onclick="searchStalls()">Search</button>
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards" id="cards"></div>
+
+  </div>
+</div>
 
 <!-- POPUP -->
 <div id="popup" class="popup">
@@ -101,87 +56,109 @@
 
 <script>
 
-  // 🔥 YOUR FIREBASE CONFIG (added)
-  const firebaseConfig = {
-    apiKey: "AIzaSyBuT_SZS4Fhc42QDNBBdwFnabzxPJOPWrA",
-    authDomain: "streetfood-finder.firebaseapp.com",
-    projectId: "streetfood-finder",
-    storageBucket: "streetfood-finder.firebasestorage.app",
-    messagingSenderId: "541010943511",
-    appId: "1:541010943511:web:9f70509b949b2f20f0c652",
-    measurementId: "G-LEP08W48E2"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBuT_SZS4Fhc42QDNBBdwFnabzxPJOPWrA",
+  authDomain: "streetfood-finder.firebaseapp.com",
+  projectId: "streetfood-finder",
+};
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-  // POPUP
-  function openPopup() {
-    document.getElementById("popup").style.display = "flex";
+function openPopup() {
+  document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+
+// 🔥 CLOUDINARY UPLOAD
+function addStall() {
+  let name = document.getElementById("stallName").value;
+  let location = document.getElementById("stallLocation").value;
+  let rating = document.getElementById("stallRating").value;
+  let file = document.getElementById("stallImage").files[0];
+
+  if (!name || !location || !rating || !file) {
+    alert("Fill all fields!");
+    return;
   }
 
-  function closePopup() {
-    document.getElementById("popup").style.display = "none";
-  }
+  let formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "new_rd");
 
-  // 🚀 ADD STALL (CLOUDINARY UPLOAD)
-  function addStall() {
-    let name = document.getElementById("stallName").value;
-    let location = document.getElementById("stallLocation").value;
-    let rating = document.getElementById("stallRating").value;
-    let file = document.getElementById("stallImage").files[0];
+  fetch("https://api.cloudinary.com/v1_1/dlptddjli/image/upload", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
 
-    if (!name || !location || !rating || !file) {
-      alert("Fill all fields!");
-      return;
-    }
-
-    let formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "new_rd");
-
-    fetch("https://api.cloudinary.com/v1_1/dlptddjli/image/upload", {
-      method: "POST",
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-
-      db.collection("stalls").add({
-        name: name,
-        location: location,
-        rating: rating,
-        image: data.secure_url
-      });
-
-      alert("Uploaded ✅");
-      closePopup();
-      loadStalls();
+    db.collection("stalls").add({
+      name,
+      location,
+      rating,
+      image: data.secure_url
     });
-  }
 
-  // SHOW STALLS
-  function loadStalls() {
-    let container = document.getElementById("cards");
-    container.innerHTML = "";
+    closePopup();
+    loadStalls();
+  });
+}
 
-    db.collection("stalls").get().then(snapshot => {
-      snapshot.forEach(doc => {
-        let stall = doc.data();
+// LOAD
+function loadStalls() {
+  let container = document.getElementById("cards");
+  container.innerHTML = "";
 
+  db.collection("stalls").get().then(snapshot => {
+    snapshot.forEach(doc => {
+      let s = doc.data();
+
+      container.innerHTML += `
+        <div class="card">
+          <img src="${s.image}">
+          <h3>${s.name}</h3>
+          <p>📍 ${s.location}</p>
+          <p>⭐ ${s.rating}</p>
+        </div>
+      `;
+    });
+  });
+}
+
+// SEARCH
+function searchStalls() {
+  let loc = document.getElementById("searchLocation").value.toLowerCase();
+  let food = document.getElementById("searchFood").value.toLowerCase();
+
+  let container = document.getElementById("cards");
+  container.innerHTML = "";
+
+  db.collection("stalls").get().then(snapshot => {
+    snapshot.forEach(doc => {
+      let s = doc.data();
+
+      if (
+        s.location.toLowerCase().includes(loc) &&
+        s.name.toLowerCase().includes(food)
+      ) {
         container.innerHTML += `
           <div class="card">
-            <img src="${stall.image}">
-            <h3>${stall.name}</h3>
-            <p>📍 ${stall.location}</p>
-            <p>⭐ ${stall.rating}</p>
+            <img src="${s.image}">
+            <h3>${s.name}</h3>
+            <p>📍 ${s.location}</p>
+            <p>⭐ ${s.rating}</p>
           </div>
         `;
-      });
+      }
     });
-  }
+  });
+}
 
-  loadStalls();
+loadStalls();
 
 </script>
 
