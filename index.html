@@ -279,5 +279,65 @@ loadStalls();
 
 </script>
 
+<body>
+
+<!-- 🌙 THEME -->
+<div class="theme-btn" onclick="toggleTheme()">🌙</div>
+
+<!-- ☰ MENU BUTTON -->
+<div class="menu-btn" onclick="toggleSidebar()">☰</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+  <h2>🍜 SFF</h2>
+  <button onclick="openPopup()">➕ Add Stall</button>
+  <button>🔍 Explore</button>
+  <button>🎨 Customize</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- PREMIUM SEARCH -->
+  <div class="search-box">
+    <input id="searchLocation" placeholder="📍 Location">
+    <input id="searchFood" placeholder="🍔 What do you want?">
+    <button onclick="searchStalls()">Search</button>
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards" id="cards"></div>
+
+</div>
+
+<!-- POPUP (KEEP SAME) -->
+<div id="popup" class="popup">
+  <div class="popup-box">
+
+    <h2>Add Stall</h2>
+
+    <input id="stallName" placeholder="Stall Name">
+    <input id="stallLocation" placeholder="Location">
+    <input id="stallRating" placeholder="Rating (1-5)">
+    <input type="file" id="stallImage">
+
+    <img id="preview" style="display:none; width:100%; margin-top:10px; border-radius:10px;">
+
+    <div id="progressBox">
+      <div style="background:#ddd;">
+        <div id="progressBar" style="width:0%; height:8px; background:orange;"></div>
+      </div>
+    </div>
+
+    <br>
+    <button onclick="addStall()">Submit</button>
+    <button onclick="closePopup()">Close</button>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+<div class="menu-btn" onclick="toggleSidebar()">☰</div>
+
 </body>
 </html>

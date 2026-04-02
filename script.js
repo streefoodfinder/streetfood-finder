@@ -165,3 +165,16 @@ function showToast(msg) {
 
 // 🔄 LOAD ON START
 loadStalls();
+
+function toggleSidebar() {
+  let sidebar = document.getElementById("sidebar");
+
+  if (sidebar.style.left === "0px") {
+    sidebar.style.left = "-220px";
+  } else {
+    sidebar.style.left = "0px";
+  }
+}
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("active");
+}
