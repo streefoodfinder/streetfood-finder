@@ -1,166 +1,125 @@
-// 🔥 Firebase Config
+// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBuT_SZS4Fhc42QDNBBdwFnabzxPJOPWrA",
   authDomain: "streetfood-finder.firebaseapp.com",
   projectId: "streetfood-finder",
-  storageBucket: "streetfood-finder.firebasestorage.app",
-  messagingSenderId: "541010943511",
-  appId: "1:541010943511:web:9f70509b949b2f20f0c652"
 };
 
-// Init
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Popup
+
+// 📌 POPUP
 function openPopup() {
-  document.getElementById("popupForm").style.display = "flex";
+  document.getElementById("popup").style.display = "flex";
 }
 
 function closePopup() {
-  document.getElementById("popupForm").style.display = "none";
+  document.getElementById("popup").style.display = "none";
 }
 
-// ➕ Add Stall
+
+// 🚀 ADD STALL (WITH CLOUDINARY IMAGE UPLOAD)
 function addStall() {
   let name = document.getElementById("stallName").value;
   let location = document.getElementById("stallLocation").value;
-  let image = document.getElementById("stallImage").value;
   let rating = document.getElementById("stallRating").value;
+  let file = document.getElementById("stallImage").files[0];
 
-  if (!name || !location || !rating) {
+  if (!name || !location || !rating || !file) {
     alert("Fill all fields!");
     return;
   }
 
-  db.collection("stalls").add({
-    name,
-    location,
-    image,
-    rating,
-    comments: []
-  });
+  let formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "new_rd");
 
-  closePopup();
+  // ⚠️ IMPORTANT: YOUR CORRECT CLOUD NAME USED HERE
+  fetch("https://api.cloudinary.com/v1_1/dlptddlij/image/upload", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    if (data.secure_url) {
+
+      db.collection("stalls").add({
+        name: name,
+        location: location,
+        rating: rating,
+        image: data.secure_url
+      });
+
+      alert("Upload successful ✅");
+      closePopup();
+      loadStalls();
+
+    } else {
+      alert("Upload failed ❌");
+      console.log(data);
+    }
+
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error uploading image ❌");
+  });
 }
 
-// 📋 Show Stalls (REALTIME)
-function showStalls() {
-  db.collection("stalls").onSnapshot(snapshot => {
-    let container = document.querySelector(".cards");
-    container.innerHTML = "";
 
+// 📦 LOAD STALLS
+function loadStalls() {
+  let container = document.getElementById("cards");
+  container.innerHTML = "";
+
+  db.collection("stalls").get().then(snapshot => {
     snapshot.forEach(doc => {
-      let stall = doc.data();
+      let s = doc.data();
 
       container.innerHTML += `
-  <div class="card">
-    <img src="${stall.image || 'https://source.unsplash.com/400x300/?street-food'}" />
-
-    <div class="card-content">
-      <h3>${stall.name}</h3>
-      <p>📍 ${stall.location}</p>
-      <p>⭐ ${stall.rating}</p>
-
-      <button onclick="openMap('${stall.location}')">Get Direction</button>
-    </div>
-  </div>
-`;
+        <div class="card">
+          <img src="${s.image}">
+          <h3>${s.name}</h3>
+          <p>📍 ${s.location}</p>
+          <p>⭐ ${s.rating}</p>
+        </div>
+      `;
     });
   });
 }
 
-// 💬 Add Comment
-function addComment(id) {
-  let input = document.getElementById("c-" + id).value;
 
-  if (!input) return;
-
-  db.collection("stalls").doc(id).update({
-    comments: firebase.firestore.FieldValue.arrayUnion(input)
-  });
-}
-
-// Load
-window.onload = function () {
-  showStalls();
-};
-
-// Welcome Popup
-function closeWelcome() {
-  document.getElementById("welcomePopup").style.display = "none";
-}
-
-// Auto close after 7 sec
-window.onload = function () {
-  setTimeout(() => {
-    let popup = document.getElementById("welcomePopup");
-    if (popup) popup.style.display = "none";
-  }, 7000);
-
-  showStalls(); // keep your existing function
-};
-
-// Theme toggle
-function toggleTheme() {
-  document.body.classList.toggle("dark");
-}
-
-// Customize toggle (basic for now)
-function toggleCustomize() {
-  alert("Customize panel coming next 🔥");
-}
+// 🔍 SEARCH
 function searchStalls() {
-  let locationInput = document.getElementById("searchLocation").value.toLowerCase();
-  let foodInput = document.getElementById("searchFood").value.toLowerCase();
+  let loc = document.getElementById("searchLocation").value.toLowerCase();
+  let food = document.getElementById("searchFood").value.toLowerCase();
+
+  let container = document.getElementById("cards");
+  container.innerHTML = "";
 
   db.collection("stalls").get().then(snapshot => {
-    let container = document.querySelector(".cards");
-    container.innerHTML = "";
-
     snapshot.forEach(doc => {
-      let stall = doc.data();
+      let s = doc.data();
 
-      let stallLocation = (stall.location || "").toLowerCase();
-      let stallName = (stall.name || "").toLowerCase();
-
-      let matchLocation = locationInput === "" || stallLocation.includes(locationInput);
-      let matchFood = foodInput === "" || stallName.includes(foodInput);
-
-      if (matchLocation && matchFood) {
+      if (
+        s.location.toLowerCase().includes(loc) &&
+        s.name.toLowerCase().includes(food)
+      ) {
         container.innerHTML += `
           <div class="card">
-            <img src="${stall.image || 'https://source.unsplash.com/400x300/?food'}" />
-            <div>
-              <h3>${stall.name}</h3>
-              <p>📍 ${stall.location}</p>
-              <p>⭐ ${stall.rating}</p>
-            </div>
+            <img src="${s.image}">
+            <h3>${s.name}</h3>
+            <p>📍 ${s.location}</p>
+            <p>⭐ ${s.rating}</p>
           </div>
         `;
       }
     });
   });
 }
-function getLocation() {
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported");
-    return;
-  }
 
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      let lat = position.coords.latitude;
-      let lon = position.coords.longitude;
 
-      alert("Location detected ✅\nLat: " + lat + "\nLon: " + lon);
-    },
-    function(error) {
-      alert("Location error ❌: " + error.message);
-    }
-  );
-}
-function openMap(location) {
-  let url = "https://www.google.com/maps/search/?api=1&query=" + location;
-  window.open(url, "_blank");
-}
+// 🔄 LOAD ON START
+loadStalls();
