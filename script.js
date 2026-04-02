@@ -126,8 +126,11 @@ function searchStalls() {
     snapshot.forEach(doc => {
       let stall = doc.data();
 
-      let matchLocation = stall.location.toLowerCase().includes(locationInput);
-      let matchFood = stall.name.toLowerCase().includes(foodInput);
+      let stallLocation = (stall.location || "").toLowerCase();
+      let stallName = (stall.name || "").toLowerCase();
+
+      let matchLocation = locationInput === "" || stallLocation.includes(locationInput);
+      let matchFood = foodInput === "" || stallName.includes(foodInput);
 
       if (matchLocation && matchFood) {
         container.innerHTML += `
