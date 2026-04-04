@@ -189,3 +189,7 @@ body.dark {
 .main {
   padding: 70px 15px;
 }
+html, body {
+  max-width: 100%;
+  overflow-x:hidden;
+}
