@@ -232,3 +232,46 @@ html, body {
   z-index: 20;
   cursor: pointer;
 }
+/* SAFE SIDEBAR FIX */
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 9;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -240px;
+  width: 220px;
+  height: 100%;
+  background: #111;
+  color: white;
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 10;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+/* IMPORTANT: push content correctly */
+.main {
+  margin-left: 0;
+}
+
+/* MENU BUTTON FIX */
+.menu-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 20;
+  font-size: 22px;
+}

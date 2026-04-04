@@ -8,20 +8,12 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 /* SIDEBAR */
-let sidebar = document.getElementById("sidebar");
-let overlay = document.getElementById("overlay");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
 function toggleSidebar(){
-  if(sidebar.classList.contains("active")){
-    closeSidebar();
-  } else {
-    openSidebar();
-  }
-}
-
-function openSidebar(){
-  sidebar.classList.add("active");
-  overlay.style.display = "block";
+  sidebar.classList.toggle("active");
+  overlay.style.display = sidebar.classList.contains("active") ? "block" : "none";
 }
 
 function closeSidebar(){
