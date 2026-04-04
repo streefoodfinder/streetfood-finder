@@ -143,3 +143,49 @@ body.dark {
   0% { transform:translateY(50px); }
   100% { transform:translateY(-50px); }
 }
+/* 📱 MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+
+  /* HEADER */
+  .header {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* SEARCH BAR STACK */
+  .top-bar {
+    flex-direction: column;
+  }
+
+  .top-bar input {
+    width: 100%;
+  }
+
+  .top-bar button {
+    width: 100%;
+  }
+
+  /* CARDS FULL WIDTH */
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  /* CARD */
+  .card {
+    width: 100%;
+  }
+
+  /* SIDEBAR WIDTH SMALL */
+  .sidebar {
+    width: 200px;
+  }
+
+  /* POPUP FIT SCREEN */
+  .popup-box {
+    width: 90%;
+  }
+
+}
+.main {
+  padding: 70px 15px;
+}
