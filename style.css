@@ -284,3 +284,15 @@ html, body {
 .stars span.active {
   color: gold;
 }
+/* 📱 FORCE MOBILE FIX */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* MOBILE LAYOUT */
+@media (max-width: 768px) {
+  .main {
+    padding: 70px 12px;
+  }
+}
