@@ -8,8 +8,25 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 /* SIDEBAR */
+let sidebar = document.getElementById("sidebar");
+let overlay = document.getElementById("overlay");
+
 function toggleSidebar(){
-  sidebar.classList.toggle("active");
+  if(sidebar.classList.contains("active")){
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
+}
+
+function openSidebar(){
+  sidebar.classList.add("active");
+  overlay.style.display = "block";
+}
+
+function closeSidebar(){
+  sidebar.classList.remove("active");
+  overlay.style.display = "none";
 }
 
 /* THEME */
