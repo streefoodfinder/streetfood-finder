@@ -32,14 +32,22 @@ function closePopup(){ popup.style.display="none"; }
 
 /* STAR */
 let rating = 0;
+
 function setRating(r){
   rating = r;
+
   let stars = document.querySelectorAll(".stars span");
-  stars.forEach((s,i)=>{
-    s.classList.toggle("active", i<r);
+
+  stars.forEach((star, index) => {
+    if(index < r){
+      star.classList.add("active");
+      star.innerText = "⭐";
+    } else {
+      star.classList.remove("active");
+      star.innerText = "☆";
+    }
   });
 }
-
 /* ADD */
 function addStall(){
   let name = stallName.value;
